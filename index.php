@@ -1,109 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
 <html class="no-js">
+
 <head>
 	<meta charset="utf-8" />
-
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<meta property="og:url"                content="http://map.sailfuture.org/" />
+	<meta property="og:type"               content="website" />
+	<meta property="og:title"              content="SailFuture Live Map" />
+	<meta property="og:description"        content="Follow Defy The Odds and our crew live as they sail the Caribbean over the next three months." />
+	<meta property="og:image"              content="https://s3.us-east-2.amazonaws.com/sailfuture.org/map_facebook.jpg" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 
 <?php wp_head(); ?>
-		<title>Hello, world!</title>
-		<style>
-		.fixy {
-			position: absolute;
-		}
+<style>
+.mapmaster {
+	position:fixed;
+	width:calc(100% - 186px);
+	height:calc(100% - 0px);
+	z-index: 0;
+}
 
-		.fixy.i1 {
-			width:40%;
-			height:100%;
-			margin-right:10%;
-			float:right;
-		}
+#bitnami-banner {
+	display:none;
+}
 
-		.fixy.i2 {
-			width:10%;
-			height:100%;
-			right:0px;
-		}
+.leaflet-marker-live {
+     -webkit-animation: pulse 2s ease-out;
+     animation: pulse 2s ease-out;
+     -webkit-animation-iteration-count: infinite;
+     animation-iteration-count: infinite;
+    }
 
-		.fixy.i3 {
-			width:20%;
-			height:100%;
-			right:10%;
-		}
+    @-webkit-keyframes pulse {
+      from { stroke-width: 15; stroke-opacity: 1; }
+      to { stroke-width: 50; stroke-opacity: 0; }
+    }
 
-		div.lists.active {
+    @keyframes pulse {
+      from { stroke-width: 15; stroke-opacity: 1; }
+      to { stroke-width: 50; stroke-opacity: 0; }
+    }
 
-		}
-
-		.bg-secondary {
-			color:white!important;
-		}
-
-		.mapmaster {
-			position:fixed;
-			width:70%;
-			height:calc(100% - 75px);
-			z-index: 0;
-		}
-
-		a {
-			cursor: pointer;
-		}
-
-		.pointer {
-			cursor: pointer;
-		}
-
-
-		</style>
-		<script src="https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/leaflet.js"></script>
-		<script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
-		<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
-		<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/reqwest.min.js'></script>
-		<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/Leaflet.MakiMarkers.js'></script>
-		<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/Leaflet.SpotTracker.js'></script>
-
+</style>
+<script src="https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/leaflet.js"></script>
+<script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
+<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/reqwest.min.js'></script>
+<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/Leaflet.MakiMarkers.js'></script>
+<script src='https://sailfuture.org/map/wp-content/themes/twentyfifteen-child_103/twentyfifteen-child/js/Leaflet.SpotTracker.js'></script>
 </head>
 
 <body>
 
-		<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-		  <a class="navbar-brand" href="#">Navbar w/ text</a>
-		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-		    <span class="navbar-toggler-icon"></span>
-		  </button>
-		  <div class="collapse navbar-collapse" id="navbarText">
-		    <ul class="navbar-nav mr-auto">
-		      <li class="nav-item active">
-		        <a class="nav-link" href="/single-page">Home <span class="sr-only">(current)</span></a>
-		      </li>
-		      <li class="nav-item">
-		        <a class="nav-link" href="#">Features</a>
-		      </li>
-		      <li class="nav-item">
-		        <a class="nav-link" href="#">Pricing</a>
-		      </li>
-		    </ul>
-		    <span class="navbar-text">
-		      Navbar text with an inline element
-		    </span>
-		  </div>
-		</nav>
+	<div id="map" class="mapmaster"></div>
 
-<div id="map" class="mapmaster"></div>
 
-<div class="container-fluid">
-	<div class="row" style="background-color:#fff">
+	<div id="place" class="place">
+		<div id="place-content" class="scroller">
 
-	<div id="place" class="card fixy i1 px-4 py-4 pt-0 postshow" style="background-color:#fff">
+		</div>
+		<a id="close-place" class="close-place"></a>
 	</div>
 
-	<div id="places" class="fixy i3 p-4" style="background-color:#efefef;overflow: auto;">
-		<div class="">
+	<div id="places" class="places">
+		<div class="scroller">
+			<div class="scroll-container">
 				<ul id="places-list">
+
 					<?php
 						$args = array(
 							'date_query' => array(
@@ -120,20 +82,13 @@
 
 								$cat_collection = get_the_category();
 								?>
-
-								<li class="ajax-post-call mb-4 pointer" id="postID<?php echo get_the_ID(); ?>" data-post-id="<?php echo get_the_ID(); ?>" href="">
-									<a href="#" class="lists active">
-<div class="card stacked" href="">
-	<?php the_post_thumbnail( 'full', array( 'class' => 'card-img-top' ) ); ?>
-	<div class="card-body">
-		<h5 class="card-title"><?php the_title(); ?></h5>
-		<p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-		<a href="#" class="btn btn-primary">Go somewhere</a>
-	</div>
-	<div class="card-footer">
-<small class="text-muted"><?php echo $cat_collection[0]->name; ?></small>
-</div>
-</div>
+								<li class="ajax-post-call" id="postID<?php echo get_the_ID(); ?>" data-post-id="<?php echo get_the_ID(); ?>">
+									<a href="#">
+										<div class="mask img-holder cover-img loading">
+											<?php the_post_thumbnail(); ?>
+										</div>
+										<span class="title"><?php the_title(); ?></span>
+										<!-- <span class="cats"><?php echo $cat_collection[0]->name; ?></span> -->
 									</a>
 								</li>
 								<?php
@@ -142,8 +97,31 @@
 						}
 					?>
 				</ul>
+			</div>
 		</div>
 	</div>
+
+	<div id="overlay" class="overlay">
+		<div class="scroller">
+			<div class="scroll-container">
+				<div id="about" class="about">
+					<div class="table">
+						<div class="table-cell">
+							<div class="centered">
+
+								<h1>WELCOME</h1>
+								<div class="intro-text">Thanks for your Interesting</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="copyright">
+
+					</div>
+				</div>
+
+			</div>
+		</div>
 
 
 		<!--<nav id="top-menu" class="menu top-menu">
@@ -151,23 +129,51 @@
 				<li><a id="toggle-overlay">About</a></li>
 			</ul>
 		</nav>-->
-<div class="fixy i2 p-4 bg-secondary";>
-		<nav id="bottom-menu">
-			<ul class="list-group h-100">
+
+		<nav id="bottom-menu" class="menu bottom-menu">
+			<ul>
 				<li>
-					<a href="#" class="post-month-ajax-call list-group-item active" data-month-id="0">All</a>
+					<a href="#" class="post-month-ajax-call active" data-month-id="0">All</a>
 				</li>
 				<li>
-					<a href="#" class="post-month-ajax-call list-group-item" data-month-id="1">January</a>
+					<a href="#" class="post-month-ajax-call" data-month-id="1">January</a>
 				</li>
-  <li class="list-group-item">Morbi leo risus</li>
-  <li class="list-group-item">Porta ac consectetur ac</li>
-  <li class="list-group-item">Vestibulum at eros</li>
-</ul>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="2">February</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="3">March</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="4">April</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="5">May</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="6">June</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="7">July</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="8">Auguest</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="9">September</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="10">October</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="11">November</a>
+				</li>
+				<li>
+					<a href="#" class="post-month-ajax-call" data-month-id="12">December</a>
+				</li>
+			</ul>
 		</nav>
-		</div>
 	</div>
-</div>
 
 	<nav id="mobile-menu" class="menu mobile-menu">
 		<div id="home-nav" class="mobile-nav home-nav">
@@ -240,7 +246,7 @@
 	<div id="intro" class="full intro">
 		<div id="intro-content" class="table">
 			<div class="table-cell">
-				<h1>THIS ONE v3</h1>
+				<h1>WELCOME</h1>
 				<div class="intro-text">Thanks for your Interesting</div>
 			</div>
 		</div>
@@ -249,28 +255,22 @@
 
 <script type="text/javascript">
 
-
-	// marker.on('click', function() {
-	//     $(marker._icon).addClass('ajax-post-call');
-	// });
-
-
-	function markerOnClick(e) {
-	    map.setView(e.target.getLatLng(),10);
-
-	}
+function markerOnClick(e) {
+		map.setView(e.target.getLatLng(),10);
+}
 
 	(function($) {
 
-		$('#place').css({
-			'left' : '100%'
+		$('.intro').css({
+			'left' : '2000px',
+			'transition' : '1s',
+			'display' : 'none'
 		});
+
 
 	}(jQuery));
 
 </script>
-
-
 
 <?php wp_footer(); ?>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>

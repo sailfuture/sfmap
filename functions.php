@@ -25,7 +25,7 @@ function twentyfifteenchild_theme_setup()
 
     	wp_enqueue_script( 'custom',  get_stylesheet_directory_uri() . '/js/custom.js', array( 'jquery' ), '1.0', true );
 
-		wp_enqueue_script( 'ajax-call',  get_stylesheet_directory_uri() . '/js/ajax-call.js', array( 'jquery' ), '3.0', true );
+		wp_enqueue_script( 'ajax-call',  get_stylesheet_directory_uri() . '/js/ajax-call.js', array( 'jquery' ), '1.0', true );
 
 		wp_localize_script( 'ajax-call', 'ajaxcall', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' )
@@ -34,6 +34,7 @@ function twentyfifteenchild_theme_setup()
 
 }
 add_action( 'after_setup_theme', 'twentyfifteenchild_theme_setup' );
+
 
 
 add_action( 'wp_ajax_nopriv_ajax_get_post_by_month', 'ajax_get_post_by_month' );
@@ -58,19 +59,13 @@ function ajax_get_post_by_month()
 			$cat_collection = get_the_category();
 			?>
 			<li class="ajax-post-call" id="postID<?php echo get_the_ID(); ?>" data-post-id="<?php echo get_the_ID(); ?>">
-        <a href="#">
-          <div class="card stacked p-4">
-          	<?php the_post_thumbnail( 'full', array( 'class' => 'card-img-top' ) ); ?>
-          	<div class="card-body">
-          		<h5 class="card-title"><?php the_title(); ?></h5>
-          		<p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          		<a href="#" class="btn btn-primary">Go somewhere</a>
-          	</div>
-          	<div class="card-footer">
-          <small class="text-muted"><?php echo $cat_collection[0]->name; ?></small>
-          </div>
-          </div>
-        </a>
+				<a href="#" class="lists">
+					<div class="mask img-holder cover-img">
+						<?php the_post_thumbnail(); ?>
+					</div>
+					<span class="title"><?php the_title(); ?></span>
+					<span class="cats"><?php echo $cat_collection[0]->name; ?></span>
+				</a>
 			</li>
 			<?php
 		}
@@ -80,7 +75,9 @@ function ajax_get_post_by_month()
 	{
 		?>
 		<li class="not-found">
-<div class="post-content alert alert-danger" id="loader">No posts found</div>
+			<a href="#">
+				<span class="title">No Post Found !</span>
+			</a>
 		</li>
 		<?php
 	}
@@ -88,6 +85,7 @@ function ajax_get_post_by_month()
     die();
 }
 
+//added posts//
 add_action( 'wp_ajax_nopriv_ajax_get_all_posts', 'ajax_get_all_posts' );
 add_action( 'wp_ajax_ajax_get_all_posts', 'ajax_get_all_posts' );
 function ajax_get_all_posts()
@@ -126,6 +124,7 @@ function ajax_get_all_posts()
 }
 
 
+
 add_action( 'wp_ajax_nopriv_ajax_get_post_by_id', 'ajax_get_post_by_id' );
 add_action( 'wp_ajax_ajax_get_post_by_id', 'ajax_get_post_by_id' );
 function ajax_get_post_by_id()
@@ -141,26 +140,42 @@ function ajax_get_post_by_id()
 
 			$cat_collection = get_the_category();
 			?>
-            <div class="card-header bg-white">
-                <?php the_title(); ?>
-                <a class="close" id="close-place" onclick="Mapper.closePost()">
-                    <span>&times;</span>
-                </a>
-            </div>
-            <div id="place-content" class="">
-			<div class="next-priv">
-            	  <a href="#" data-previd="<?php echo get_previous_post_id( $post_id ); ?>" class="btn btn-default card-link previous_post">Previous</a>
-            	  <a href="#" data-nextid="<?php echo get_next_post_id( $post_id );; ?>" class="btn btn-default card-link float-right next_post">Next</a>
-            	 </div>
-                <?php the_post_thumbnail( 'full', array( 'class' => 'img-card-top' ) ); ?>
-                <div class="card-body">
-                    <p class="card-text"><?php the_content(); ?></p>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="card-link"><?php echo $cat_collection[0]->name; ?></a> 
-                </div>
-            </div>
-        </div>
+			<div class="scroll-container">
+				<div id="bar" class="bar">
+					<ul class="padded">
+						<!-- <li class="blue">Cat : <?php echo $cat_collection[0]->name; ?></li>
+						<li class="address">
+							Meta two
+						</li> -->
+					</ul>
+				</div>
+
+        <a class="close" id="close-place" onclick="Mapper.closePost()">
+    <span>&times;</span>
+</a>
+
+				<h1 class="padded blue"><?php the_title(); ?></h1>
+				<div class="featured-mask img-holder cover-img">
+					<?php the_post_thumbnail(); ?>
+				</div>
+
+        <div class="next-priv">
+			<?php $prev_post_id = get_previous_post_id( $post_id );  ?>
+            <a href="#" data-previd="<?php echo $prev_post_id; ?>" class="btn btn-default card-link previous_post<?php echo ($prev_post_id != null) ? '':' inactive'; ?>">Previous</a>
+
+			<?php $next_post_id = get_next_post_id( $post_id );  ?>
+            <a href="#" data-nextid="<?php echo $next_post_id; ?>" class="btn btn-default card-link float-right next_post<?php echo ($next_post_id != null) ? '':' inactive'; ?>">Next</a>
+
+         </div>
+
+				<div class="content padded">
+					<div class="column">
+						<?php the_content(); ?>
+					</div>
+				</div>
+
+				<div class="layout"></div>
+			</div>
 			<?php
 		}
 
@@ -168,17 +183,18 @@ function ajax_get_post_by_id()
 	else
 	{
 		?>
-    <div class="container">
-      <div class="alert alert-primary" role="alert">
-        A simple primary alert—check it out!
-      </div>
+		<li class="not-found">
+			<a href="#">
+				<span class="title">No Post Found !</span>
 			</a>
-  </div>
+		</li>
 		<?php
 	}
 
     die();
 }
+
+
 
 function get_previous_post_id( $post_id ) {
     // Get a global post reference since get_adjacent_post() references it
@@ -190,11 +206,14 @@ function get_previous_post_id( $post_id ) {
     // Get the post object for the previous post
     $previous_post = get_previous_post();
     // Reset our global object
-    $post = $oldGlobal;
-    if ( '' == $previous_post ) 
-        return 0;
-    return $previous_post->ID; 
-} 
+	$post = $oldGlobal;
+	if(!empty($previous_post)){
+		return $previous_post->ID;
+	}
+	else{
+		return null;
+	}
+}
 
 function get_next_post_id( $post_id ) {
     // Get a global post reference since get_adjacent_post() references it
@@ -206,22 +225,11 @@ function get_next_post_id( $post_id ) {
     // Get the post object for the next post
     $next_post = get_next_post();
     // Reset our global object
-    $post = $oldGlobal;
-    if ( '' == $next_post ) 
-        return 0;
-    return $next_post->ID; 
-} 
-
-// function is_first() {
-//     global $post;
-//     $loop = get_posts( 'numberposts=1&order=ASC' );
-//     $first = $loop[0]->ID; 
-//     return ( $post->ID == $first ) ? true : false;
-// }
-
-// function is_latest() {
-//     global $post;
-//     $loop = get_posts( 'numberposts=1' );
-//     $latest = $loop[0]->ID; 
-//     return ( $post->ID == $latest ) ? true : false;
-// }	
+	$post = $oldGlobal;
+	if(!empty($next_post)){
+		return $next_post->ID;
+	}
+	else{
+		return null;
+	}
+}
